@@ -11,3 +11,7 @@ ns1     IN  A       10.10.10.10
 prox1   IN  A       10.0.0.5
 prox2   IN  A       10.0.0.6
 evan-dev IN A       10.20.0.1
+rke2-master IN  A   10.0.10.1
+rke2-node-1 IN  A   10.0.10.2
+rke2-node-2 IN  A   10.0.10.3
+rke2-node-3 IN  A   10.0.10.4
