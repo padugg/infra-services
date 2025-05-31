@@ -1,0 +1,40 @@
+---
+- name: Enable EPEL repos
+  dnf:
+    name: epel-release
+    state: present
+
+- name: Install Bind9 and Utils
+  dnf:
+    name:
+      - bind
+      - bind-utils
+    state: present
+
+- name: Enable and Start Bind
+  systemd:
+    name: named
+    enabled: yes
+    state: started
+
+- name: Setup named.conf
+  copy:
+    src: named.conf
+    dest: "/etc/named.conf"
+    owner: root
+    group: named
+    mode: '0640'
+
+- name: Setup pad.lab zone
+  copy:
+    src: pad.lab.zone
+    dest: "/var/named/pad.lab.zone"
+    owner: named
+    group: named
+    mode: '0640'
+
+- name: Restart Named
+  systemd:
+    name: named
+    enabled: yes
+    state: restarted

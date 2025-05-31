@@ -1,1 +1,1 @@
-# infra-services
+# Scripts for Deployment of Core Services
