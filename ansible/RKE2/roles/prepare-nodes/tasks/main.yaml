@@ -1,0 +1,27 @@
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: true
+  tags: sysctl
+
+- name: Enable IPv6 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    state: present
+    reload: true
+  tags: sysctl
+
+- name: Install Pip
+  ansible.builtin.dnf:
+    name: python3-pip
+    state: present
+  when: inventory_hostname == groups['servers'][0]
+
+- name: Install Kubernetes Pip Module
+  ansible.builtin.pip:
+    name:
+      - kubernetes
+  when: inventory_hostname == groups['servers'][0]

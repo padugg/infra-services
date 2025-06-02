@@ -1,0 +1,18 @@
+---
+os: "linux"
+arch: "amd64"
+
+vip: 10.50.0.1
+
+metallb_version: v0.14.9
+lb_range: 10.100.0.0-10.100.1.0
+lb_pool_name: pad-pool
+
+ansible_become: true
+ansible_become_method: sudo
+################################################################################
+# options to change default values
+# kube_vip_version: "v0.8.0"
+# vip_interface: "eth0"
+# rke2_version: "v1.29.4+rke2r1"
+# rke2_install_dir: "/usr/local/bin"

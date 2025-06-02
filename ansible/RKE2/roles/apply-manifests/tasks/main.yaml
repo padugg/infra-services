@@ -1,0 +1,73 @@
+# Wait for Server 1 to be ready before continuing with metallb deployment
+- name: Wait for k8s nodes with node label 'server=true' to be ready, otherwise we cannot start metallb deployment
+  ansible.builtin.command:
+    cmd: "kubectl wait --for=condition=Ready nodes --selector server=true --timeout=600s"
+  register: nodes_ready
+  retries: 120
+  delay: 10
+  changed_when: true
+  become_user: "{{ ansible_user }}"
+  when: inventory_hostname == groups['servers'][0]
+
+- name: Download MetalLB YAML
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/metallb/metallb/{{ metallb_version }}/config/manifests/metallb-native.yaml"
+    dest: ~/metallb.yaml
+    mode: '0664'
+  become_user: "{{ ansible_user }}"
+  changed_when: true
+  when: inventory_hostname == groups['servers'][0]
+
+# Apply metallb manifest
+- name: Apply metallb
+  kubernetes.core.k8s:
+    state: present
+    src: ~/metallb.yaml
+  become_user: "{{ ansible_user }}"
+  changed_when: true
+  when: inventory_hostname == groups['servers'][0]
+
+# Wait for metallb deployment pods to be alive before deploying metallb manifests
+- name: Wait for metallb pods to be ready, otherwise we cannot start metallb deployment
+  ansible.builtin.command:
+    cmd: "kubectl wait --namespace metallb-system --for=condition=ready pod --selector=component=controller --timeout=1800s"
+  changed_when: true
+  become_user: "{{ ansible_user }}"
+  when: inventory_hostname == groups['servers'][0]
+
+- name: Copy metallb advertisement to server 1
+  ansible.builtin.template:
+    src: templates/metallb-l2advertisement.j2
+    dest: /home/{{ ansible_user }}/l2ad.yaml
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  when: inventory_hostname == groups['servers'][0]
+
+# Apply l2 advertisement manifest
+- name: Apply metallb l2 advertisement
+  kubernetes.core.k8s:
+    state: present
+    src: ~/l2ad.yaml
+  become_user: "{{ ansible_user }}"
+  changed_when: true
+  when: inventory_hostname == groups['servers'][0]
+
+# Deploy metal IP Pool to Server 1
+- name: Copy metallb IPPool to server 1
+  ansible.builtin.template:
+    src: templates/metallb-ippool.j2
+    dest: /home/{{ ansible_user }}/ippool.yaml
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  when: inventory_hostname == groups['servers'][0]
+
+# Apply ip pool manifest
+- name: Apply metallb ip pool
+  kubernetes.core.k8s:
+    state: present
+    src: ~/ippool.yaml
+  become_user: "{{ ansible_user }}"
+  changed_when: true
+  when: inventory_hostname == groups['servers'][0]

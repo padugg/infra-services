@@ -1,11 +1,14 @@
 resource "proxmox_vm_qemu" "cloudinit" {
   for_each = local.nodes_map
   name    =   each.key
-  target_node = "prox1"
-  cores = 4
+  target_node = each.value.node
+  cpu {
+    cores = 4
+  }
   memory  = 16384
   agent   = 1
   ciupgrade = true
+  ciuser = "pad"
   onboot = true
   searchdomain = "pad.lab"
   nameserver = "10.10.10.10"
@@ -30,7 +33,7 @@ resource "proxmox_vm_qemu" "cloudinit" {
       virtio0 {
         disk {
           storage      = "local-lvm"
-          size         = "75G"
+          size         = each.value.size
           backup       = false
         }
       }
