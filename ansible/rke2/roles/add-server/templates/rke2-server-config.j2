@@ -8,5 +8,5 @@ tls-san:
   - {{ hostvars['server3']['ansible_host'] }}
 node-label:
   - server=true
-cluster-cidr: 192.168.0.0/16
+cluster-cidr: hostvars[inventory_hostname]['cluster_cidr']
 service-cidr: 172.26.0.0/16
