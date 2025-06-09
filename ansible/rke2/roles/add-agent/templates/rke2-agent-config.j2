@@ -1,6 +1,6 @@
 write-kubeconfig-mode: "0644"
 token: {{ hostvars['server1']['token'] }}
-server: https://{{ hostvars['server1']['ansible_host'] }}:9345
+server: https://{{ vip }}:9345
 node-label:
   - "agent=true"
 cluster-cidr: 192.168.0.0/16

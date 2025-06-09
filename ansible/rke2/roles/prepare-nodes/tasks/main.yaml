@@ -20,7 +20,6 @@
       - python3-pip
       - iptables
     state: present
-  when: inventory_hostname == groups['servers'][0]
 
 - name: Install Kubernetes Pip Module
   ansible.builtin.pip:
