@@ -6,7 +6,14 @@ image:
 
 variables:
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/k8s-cluster
-  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}
+  TF_HTTP_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}
+  TF_HTTP_LOCK_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock
+  TF_HTTP_UNLOCK_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock
+  TF_HTTP_USERNAME: gitlab-ci-token
+  TF_HTTP_PASSWORD: ${CI_JOB_TOKEN}
+  TF_HTTP_LOCK_METHOD: POST
+  TF_HTTP_UNLOCK_METHOD: DELETE
+  TF_HTTP_RETRY_WAIT_MIN: 5
 
 cache:
   key: "${TF_ROOT}"
@@ -16,16 +23,7 @@ cache:
 before_script:
   - cd ${TF_ROOT}
   - terraform --version
-  - |
-    terraform init \
-      -backend-config="address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}" \
-      -backend-config="lock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock" \
-      -backend-config="unlock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock" \
-      -backend-config="username=${CI_USERNAME}" \
-      -backend-config="password=${CI_JOB_TOKEN}" \
-      -backend-config="lock_method=POST" \
-      -backend-config="unlock_method=DELETE" \
-      -backend-config="retry_wait_min=5"
+  - terraform init
 
 stages:
   - validate
