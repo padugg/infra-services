@@ -7,6 +7,9 @@ spec:
   chart:
     version: "9.2.0" 
     values:
+      appConfig:
+        terraformState:
+          enabled: true
       installCertmanager: false
       nginx-ingress:
         enabled: false
