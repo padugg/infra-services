@@ -6,53 +6,52 @@ image:
 
 variables:
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/k8s-cluster
-  TF_HTTP_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}
-  TF_HTTP_LOCK_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock
-  TF_HTTP_UNLOCK_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock
-  TF_HTTP_USERNAME: gitlab-ci-token
-  TF_HTTP_PASSWORD: ${CI_JOB_TOKEN}
-  TF_HTTP_LOCK_METHOD: POST
-  TF_HTTP_UNLOCK_METHOD: DELETE
-  TF_HTTP_RETRY_WAIT_MIN: 5
 
 cache:
-  key: "${TF_ROOT}"
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - ${TF_ROOT}/.terraform
+    - ${TF_ROOT}/.terraform.lock.hcl
 
 before_script:
   - cd ${TF_ROOT}
   - terraform --version
-  - terraform init
+  - |
+    terraform init \
+      -backend-config="address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_SLUG}" \
+      -backend-config="lock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_SLUG}/lock" \
+      -backend-config="unlock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_SLUG}/lock" \
+      -backend-config="username=gitlab-ci-token" \
+      -backend-config="password=${CI_JOB_TOKEN}" \
+      -backend-config="lock_method=POST" \
+      -backend-config="unlock_method=DELETE" \
+      -backend-config="retry_wait_min=5"
 
 stages:
   - validate
   - plan
-  - deploy
+  - apply
 
-validate:
+tf:validate:
   stage: validate
   script:
     - terraform validate
 
-plan:
+tf:plan:
   stage: plan
   script:
-    - terraform plan -out="planfile"
-  dependencies:
-    - validate
+    - terraform plan -out=tfplan
   artifacts:
-    name: plan
     paths:
-      - ${TF_ROOT}/planfile
+      - tfplan
     expire_in: 1 week
 
-deploy:
-  stage: deploy
+tf:apply:
+  stage: apply
   script:
-    - terraform apply -input=false "planfile"
+    - terraform apply -input=false tfplan
   dependencies:
-    - plan
+    - tf:plan
   when: manual
   only:
     - main
