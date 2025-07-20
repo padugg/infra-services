@@ -40,7 +40,7 @@ tf:validate:
 tf:plan:
   stage: plan
   script:
-    - terraform plan -out=tfplan
+    - terraform plan
   artifacts:
     paths:
       - tfplan
@@ -49,7 +49,7 @@ tf:plan:
 tf:apply:
   stage: apply
   script:
-    - terraform apply -input=false tfplan
+    - terraform apply -input=false
   dependencies:
     - tf:plan
   when: manual
