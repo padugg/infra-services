@@ -1,0 +1,6 @@
+gitlabUrl: https://gitlab.padugg.com
+rbac:
+  create: true
+serviceAccount:
+  create: true
+runnerToken: ${GITLAB_RUNNER_TOKEN}

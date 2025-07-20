@@ -26,11 +26,13 @@ stages:
 validate:
   stage: validate
   script:
+    - cd terraform/k8s-cluster
     - terraform validate
 
 plan:
   stage: plan
   script:
+    - cd terraform/k8s-cluster
     - terraform plan -out="planfile"
   dependencies:
     - validate
@@ -43,6 +45,7 @@ plan:
 deploy:
   stage: deploy
   script:
+    - cd terraform/k8s-cluster
     - terraform apply -input=false "planfile"
   dependencies:
     - plan
