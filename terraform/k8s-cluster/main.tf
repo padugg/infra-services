@@ -1,5 +1,5 @@
 resource "proxmox_vm_qemu" "cloudinit" {
-  for_each = local.nodes_map
+  for_each = var.vms
   name    =   each.key
   target_node = each.value.node
   cpu {
@@ -14,7 +14,7 @@ resource "proxmox_vm_qemu" "cloudinit" {
   nameserver = "10.10.10.10"
   sshkeys = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIMs3Kk0kKg/0kxFAZis8X4/0F5NcXyba7lQLXg+u4al"
   scsihw  = "virtio-scsi-pci"
-  clone = "CentOS-9-Stream-Template"
+  #clone = "CentOS-9-Stream-Template"
   full_clone = false
   pool = "Core"
   ipconfig0 = replace("ip=$IP/8,gw=10.0.0.1", "$IP", each.value.ip)
