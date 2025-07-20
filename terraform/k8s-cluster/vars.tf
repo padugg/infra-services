@@ -6,6 +6,10 @@ variable "proxmox_password" {
   default = "PROXMOX_PASSWORD"
 }
 
+variable "test" {
+  default = "test"
+}
+
 locals { 
   nodes = [
     {
