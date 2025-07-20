@@ -1,3 +1,11 @@
+variable "proxmox_user" {
+  default = "PROXMOX_USER"
+}
+
+variable "proxmox_password" {
+  default = "PROXMOX_PASSWORD"
+}
+
 locals { 
   nodes = [
     {
