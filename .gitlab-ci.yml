@@ -16,7 +16,16 @@ cache:
 before_script:
   - cd ${TF_ROOT}
   - terraform --version
-  - terraform init -upgrade
+  - |
+    terraform init \
+      -backend-config="address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}" \
+      -backend-config="lock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock" \
+      -backend-config="unlock_address=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}/lock" \
+      -backend-config="username=${CI_USERNAME}" \
+      -backend-config="password=${CI_JOB_TOKEN}" \
+      -backend-config="lock_method=POST" \
+      -backend-config="unlock_method=DELETE" \
+      -backend-config="retry_wait_min=5"
 
 stages:
   - validate
