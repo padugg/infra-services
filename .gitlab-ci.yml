@@ -1,0 +1,9 @@
+include:
+  - component: $CI_SERVER_FQDN/components/opentofu/validate-plan-apply@2.13.0
+    inputs:
+      opentofu_version: 2.13.0
+      auto_encryption: true
+      auto_encryption_passphrase: $PASSPHRASE
+
+stages: [validate, build, deploy]
+

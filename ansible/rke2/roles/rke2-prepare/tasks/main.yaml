@@ -99,6 +99,7 @@
 - name: Save Master node-token for later
   ansible.builtin.set_fact:
     token: "{{ rke2_token.content | b64decode | regex_replace('\n', '') }}"
+  when: inventory_hostname == groups['servers'][0]
 
 # revert token file access
 - name: Restore node-token file access

@@ -37,6 +37,13 @@ resource "proxmox_vm_qemu" "cloudinit" {
           backup       = false
         }
       }
+      virtio1 {
+        disk {
+          storage      = "local-lvm"
+          size         = 150
+          backup       = false
+        }
+      }
     }
     ide {
       ide0 {

@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-padugg-com
+spec:
+  secretName: wildcard-padugg-com-tls
+  renewBefore: 240h
+  dnsNames:
+  - '*.padugg.com'
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: padugg-com
+spec:
+  secretName: padugg-com-tls
+  renewBefore: 240h
+  dnsNames:
+  - 'padugg.com'
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
