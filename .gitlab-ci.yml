@@ -5,7 +5,7 @@ image:
     - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 variables:
-  TF_ROOT: ${CI_PROJECT_DIR}
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform/k8s-cluster
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}
 
 cache:
@@ -16,7 +16,7 @@ cache:
 before_script:
   - cd ${TF_ROOT}
   - terraform --version
-  - terraform init
+  - terraform init -upgrade
 
 stages:
   - validate
@@ -26,13 +26,11 @@ stages:
 validate:
   stage: validate
   script:
-    - cd terraform/k8s-cluster
     - terraform validate
 
 plan:
   stage: plan
   script:
-    - cd terraform/k8s-cluster
     - terraform plan -out="planfile"
   dependencies:
     - validate
@@ -45,7 +43,6 @@ plan:
 deploy:
   stage: deploy
   script:
-    - cd terraform/k8s-cluster
     - terraform apply -input=false "planfile"
   dependencies:
     - plan
