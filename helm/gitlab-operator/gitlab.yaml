@@ -7,13 +7,13 @@ spec:
   chart:
     version: "9.2.0" 
     values:
-      appConfig:
-        terraformState:
-          enabled: true
       installCertmanager: false
       nginx-ingress:
         enabled: false
       global:
+        appConfig:
+          terraformState:
+            enabled: true
         hosts:
           domain: padugg.com # use a real domain here
         ingress:
