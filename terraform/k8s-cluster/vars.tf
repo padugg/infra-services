@@ -49,6 +49,13 @@ variable "vms" {
       ip   = "10.0.10.14"
       size = "75G"
     }
+
+    "rke2-node-5" = {
+      node = "prox2"
+      hostname = "rke2-node-5.pad.lab"
+      ip   = "10.0.10.15"
+      size = "75G"
+    }
   }
 }
   
