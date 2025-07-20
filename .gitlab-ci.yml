@@ -1,9 +1,51 @@
-include:
-  - component: $CI_SERVER_FQDN/components/opentofu/validate-plan-apply@2.13.0
-    inputs:
-      opentofu_version: 2.13.0
-      auto_encryption: true
-      auto_encryption_passphrase: $PASSPHRASE
+image:
+  name: hashicorp/terraform:latest
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
-stages: [validate, build, deploy]
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_COMMIT_REF_NAME}
 
+cache:
+  key: "${TF_ROOT}"
+  paths:
+    - ${TF_ROOT}/.terraform
+
+before_script:
+  - cd ${TF_ROOT}
+  - terraform --version
+  - terraform init
+
+stages:
+  - validate
+  - plan
+  - deploy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+
+plan:
+  stage: plan
+  script:
+    - terraform plan -out="planfile"
+  dependencies:
+    - validate
+  artifacts:
+    name: plan
+    paths:
+      - ${TF_ROOT}/planfile
+    expire_in: 1 week
+
+deploy:
+  stage: deploy
+  script:
+    - terraform apply -input=false "planfile"
+  dependencies:
+    - plan
+  when: manual
+  only:
+    - main
