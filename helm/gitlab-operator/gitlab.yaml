@@ -14,6 +14,16 @@ spec:
         appConfig:
           terraformState:
             enabled: true
+          omniauth:
+            enabled: true
+            allowedSingleSignOn: ['openid_connect']
+            autoLinkUser: ['openid_connect']
+            syncProfileFromProvider: ['openid_connect']
+            syncProfileAttributes: ['email']
+            blockAutoCreatedUsers: false
+            providers:
+              - secret: gitlab-omniauth
+                key: openid_connect
         hosts:
           domain: padugg.com # use a real domain here
         ingress:
